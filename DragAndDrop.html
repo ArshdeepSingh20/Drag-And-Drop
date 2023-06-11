@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        /* Container to hold the boxes */
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* Individual box styles */
+        .box {
+            display: flex;
+            height: 400px;
+            width: 300px;
+            background-color: #86B7F7;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 6px 6px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Styling for draggable items */
+        .item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background-color: #D7DADE;
+            font-size: 18px;
+            margin: 5px;
+            padding: 10px;
+            cursor: grab;
+            border-radius: 5px;
+        }
+
+        /* Styling for hovered items */
+        .item:hover {
+            background-color: #F2F6FF;
+            font-size: 30px;
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+        }
+
+        /* Styles for the dragging box */
+        .box.dragging {
+            opacity: 0.5;
+        }
+
+        /* Styles for the drop target box */
+        .box.drop-target {
+            border: 2px dashed blue;
+        }
+
+        /* Container for the reset button */
+        .reset-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        /* Success message styles */
+        .success-message {
+            font-size: larger;
+            color: green;
+        }
+
+        /* Styles for the reset button */
+        button {
+            padding: 10px;
+            width: 100px;
+            border-radius: 10px;
+            background-color: E8EAED;
+            font-size: 20px;
+            color: #024E74;
+            cursor: pointer;
+            box-shadow: 4px 4px 8px white;
+        }
+
+        /* Styling for hovered button */
+        button:hover {
+            padding: 12px;
+            width: 120px;
+            border-radius: 15px;
+            font-size: 25px;
+            background-color: #024E74;
+            color: white;
+            box-shadow: 4px 4px 8px #B6BBBF;
+        }
+
+        /* Media query for smaller screens */
+        @media only screen and (max-width: 768px) {
+            .box {
+                flex-basis: 100%;
+                max-width: 100%;
+            }
+    </style>
+    <script>
+        function handleDragStart(event) {
+
+            /* When a drag starts, set the data to be transferred as the ID of the dragged item */
+
+            event.dataTransfer.setData("text/plain", event.target.id);
+
+            /*  Add a CSS class to the dragged item to change its appearance */
+            event.currentTarget.classList.add("dragging");
+        }
+
+        function handleDragOver(event) {
+
+            /* Prevent default behavior to allow a drop to occur */
+            event.preventDefault();
+
+            /* Add a CSS class to the drop target to change its appearance */
+            event.currentTarget.classList.add("drop-target");
+        }
+
+        function handleDragLeave(event) {
+
+            /* Remove the CSS class from the drop target when the dragged item leaves it */
+            event.currentTarget.classList.remove("drop-target");
+        }
+
+        function handleDrop(event) {
+
+            /* Prevent default behavior to handle the drop manually */
+            event.preventDefault();
+
+            /* Get the ID of the dragged item from the transferred data */
+            var itemId = event.dataTransfer.getData("text/plain");
+
+            /* Get the dragged item element by its ID */
+            var draggedItem = document.getElementById(itemId);
+
+            /* Get the first container element */
+            var container1 = document.getElementById("box1");
+
+            /* Remove the dragged item from the first container */
+            container1.removeChild(draggedItem);
+
+            /*  Append the dragged item to the drop target container */
+            event.currentTarget.appendChild(draggedItem);
+
+            /*  Remove the CSS classes from the drop target and dragged item */
+            event.currentTarget.classList.remove("drop-target");
+            draggedItem.classList.remove("dragging");
+
+            /* Display success message */
+            var successMessage = document.getElementById("success-message");
+            successMessage.style.display = "block";
+            successMessage.textContent = "Item dropped successfully!";
+
+            /*  Change appearence of dropped item */
+            draggedItem.style.height = '80px';
+            draggedItem.style.width = '80px'; 
+            draggedItem.style.backgroundColor = '#F2F6FF'; 
+            draggedItem.style.fontSize='25px';
+            draggedItem.style.borderRadius= '10px';
+        }
+
+
+
+        function handleReset() {
+            var box1 = document.getElementById("box1");
+            var box2 = document.getElementById("box2");
+
+            /*  Clear the second container */
+            box2.innerHTML = "";
+
+            /*  Restore the original items in the first container */
+
+            box1.innerHTML = `
+        <div class="item" id="item1" draggable="true" ondragstart="handleDragStart(event)">Item 1</div>
+        <div class="item" id="item2" draggable="true" ondragstart="handleDragStart(event)">Item 2</div>
+        <div class="item" id="item3" draggable="true" ondragstart="handleDragStart(event)">Item 3</div>
+      `;
+
+            /*  Hide success message on reset */
+            var successMessage = document.getElementById("success-message");
+            successMessage.style.display = "none";
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+
+        <!--first container-->
+        <div class="box" id="box1">
+            <div class="item" id="item1" draggable="true" ondragstart="handleDragStart(event)">Item 1</div>
+            <div class="item" id="item2" draggable="true" ondragstart="handleDragStart(event)">Item 2</div>
+            <div class="item" id="item3" draggable="true" ondragstart="handleDragStart(event)">Item 3</div>
+        </div>
+
+        <!--second container-->
+        <div class="box" id="box2" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)"
+            ondrop="handleDrop(event)"></div>
+    </div>
+
+    <!--success message-->
+    <div id="success-message" class="success-message"></div>
+
+    <!--reset button-->
+    <div class="reset-container">
+        <button onclick="handleReset()">Reset</button>
+    </div>
+</body>
+
+</html>
